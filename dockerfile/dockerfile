@@ -1,0 +1,225 @@
+FROM debian:12
+
+# 设置默认的 shell 为 Bash
+SHELL ["/bin/bash", "-c"]
+
+# 基础创建
+RUN mkdir -p /nuoyis-build/{php-8.4.2/ext/php-redis,php-8.1.31/ext/php-redis} && \
+mkdir -p /nuoyis-web/logs/nginx && \
+mkdir -p /nuoyis-web/nginx/{conf,webside/default,server/1.27.3/conf/ssl,webside/default} && \
+mkdir -p /var/run/php/{81,84} && \
+useradd -M -s /sbin/nologin nuoyis-web && \
+mkdir -p /etc/supervisor.d && \
+sed -i 's/http:\/\/deb.debian.org/https:\/\/mirrors.huaweicloud.com/g' /etc/apt/sources.list.d/debian.sources && apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false update -y && apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false upgrade -y && apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false install -y ca-certificates
+
+
+# nginx和php-fpm构建
+RUN apt-get update && apt-get install -y \
+    vim \
+    wget \
+    make \
+    procps \
+    gcc \
+    inetutils-ping \
+    pkg-config \
+    g++ \
+    curl \
+    libpcre3 \
+    libpcre3-dev \
+    zlib1g-dev \
+    openssl \
+    libssl-dev \
+    libxslt1-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libxml2-dev \
+    libsqlite3-dev \
+    libbz2-dev \
+    libcurl4-openssl-dev \
+    libxpm-dev \
+    libzip-dev \
+    libonig-dev \
+    libgd-dev \
+    libgeoip-dev \
+    supervisor && \
+    cd /nuoyis-build && \
+    wget https://mirrors.huaweicloud.com/nginx/nginx-1.27.3.tar.gz && \
+    wget https://alist.nuoyis.net/d/blog/linux%E8%BD%AF%E4%BB%B6%E5%8C%85%E5%8A%A0%E9%80%9F/php/php-8.4.2.tar.gz && \
+    wget https://alist.nuoyis.net/d/blog/linux%E8%BD%AF%E4%BB%B6%E5%8C%85%E5%8A%A0%E9%80%9F/php/php-8.1.31.tar.gz && \
+    wget https://ghproxy.cc/https://github.com/phpredis/phpredis/archive/refs/tags/6.1.0.tar.gz && \
+    tar -xzf nginx-1.27.3.tar.gz && tar -xzf php-8.4.2.tar.gz && tar -xzf php-8.1.31.tar.gz && tar -xzf 6.1.0.tar.gz && \
+    cd /nuoyis-build/nginx-1.27.3 && \
+    sed -i 's/#define NGINX_VERSION\s\+".*"/#define NGINX_VERSION      "1.27.3"/g' ./src/core/nginx.h && \
+    sed -i 's/"nginx\/" NGINX_VERSION/"nuoyis server"/g' ./src/core/nginx.h && \
+    sed -i 's/Server: nginx/Server: nuoyis server/g' ./src/http/ngx_http_header_filter_module.c && \
+    sed -i 's/"Server: " NGINX_VER CRLF/"Server: nuoyis server" CRLF/g' ./src/http/ngx_http_header_filter_module.c && \
+    sed -i 's/"Server: " NGINX_VER_BUILD CRLF/"Server: nuoyis server" CRLF/g' ./src/http/ngx_http_header_filter_module.c && \
+    ./configure --prefix=/nuoyis-web/nginx/server/1.27.3 \
+                --user=nuoyis-web --group=nuoyis-web \
+                --with-compat \
+                --with-file-aio \
+                --with-threads \
+                --with-http_addition_module \
+                --with-http_auth_request_module \
+                --with-http_dav_module \
+                --with-http_flv_module \
+                --with-http_gunzip_module \
+                --with-http_gzip_static_module \
+                --with-http_mp4_module \
+                --with-http_random_index_module \
+                --with-http_realip_module \
+                --with-http_secure_link_module \
+                --with-http_slice_module \
+                --with-http_ssl_module \
+                --with-http_stub_status_module \
+                --with-http_sub_module \
+                --with-http_v2_module \
+                --with-mail \
+                --with-mail_ssl_module \
+                --with-stream \
+                --with-stream_realip_module \
+                --with-stream_ssl_module \
+                --with-stream_ssl_preread_module \
+                --with-cc-opt='-static -s' \
+                --with-ld-opt=-static && \
+    make -j$(nproc) && make install && \
+    cp -r /nuoyis-build/phpredis-6.1.0/* /nuoyis-build/php-8.4.2/ext/php-redis && \
+    cp -r /nuoyis-build/phpredis-6.1.0/* /nuoyis-build/php-8.1.31/ext/php-redis && \
+    cd /nuoyis-build/php-8.4.2 && \
+    ./configure --prefix=/nuoyis-web/php/8.4.2/ \
+                --enable-static \
+                --disable-shared \
+                --with-config-file-path=/nuoyis-web/php/8.4.2/etc/ \
+                --with-curl \
+                --with-freetype \
+                --enable-gd \
+                --with-jpeg \
+                --with-gettext \
+                --with-libdir=lib64 \
+                --with-libxml \
+                --with-mysqli \
+                --with-openssl \
+                --with-pdo-mysql \
+                --with-pdo-sqlite \
+                --with-pear \
+                --enable-sockets \
+                --with-mhash \
+                --with-ldap-sasl \
+                --with-xsl \
+                --with-zlib \
+                --with-zip \
+                --with-bz2 \
+                --with-iconv \
+                --enable-fpm \
+                --enable-pdo \
+                --enable-bcmath \
+                --enable-mbregex \
+                --enable-mbstring \
+                --enable-opcache \
+                --enable-pcntl \
+                --enable-shmop \
+                --enable-soap \
+                --enable-ftp \
+                --with-xpm \
+                --enable-xml \
+                --enable-sysvsem \
+                --enable-cli \
+                --enable-intl \
+                --enable-calendar \
+                --enable-static \
+                --enable-ctype \
+                --enable-mysqlnd \
+                --enable-session \
+                --enable-redis && \
+    make -j$(nproc) && make install && \
+    cd /nuoyis-build/php-8.1.31 && \
+    ./configure --prefix=/nuoyis-web/php/8.1.31/ \
+                --enable-static \
+                --disable-shared \
+                --with-config-file-path=/nuoyis-web/php/8.1.31/etc/ \
+                --with-curl \
+                --with-freetype \
+                --enable-gd \
+                --with-jpeg \
+                --with-gettext \
+                --with-libdir=lib64 \
+                --with-libxml \
+                --with-mysqli \
+                --with-openssl \
+                --with-pdo-mysql \
+                --with-pdo-sqlite \
+                --with-pear \
+                --enable-sockets \
+                --with-mhash \
+                --with-ldap-sasl \
+                --with-xsl \
+                --with-zlib \
+                --with-zip \
+                --with-bz2 \
+                --with-iconv \
+                --enable-fpm \
+                --enable-pdo \
+                --enable-bcmath \
+                --enable-mbregex \
+                --enable-mbstring \
+                --enable-opcache \
+                --enable-pcntl \
+                --enable-shmop \
+                --enable-soap \
+                --enable-ftp \
+                --with-xpm \
+                --enable-xml \
+                --enable-sysvsem \
+                --enable-cli \
+                --enable-intl \
+                --enable-calendar \
+                --enable-static \
+                --enable-ctype \
+                --enable-mysqlnd \
+                --enable-session \
+                --enable-redis && \
+    make -j$(nproc) && make install && \
+    apt-get autoremove --purge -y \
+    make \
+    wget \
+    procps \
+    gcc \
+    procps \
+    inetutils-ping \
+    pkg-config \
+    libssl-dev \
+    g++ && \
+    apt-get remove -y \
+    libpcre3-dev \
+    zlib1g-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libbz2-dev \
+    libcurl4-openssl-dev \
+    libxpm-dev \
+    libgd-dev && \
+    apt-get clean && \
+    rm -rf /var/cache/apt/* /nuoyis-build /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    ln -s /nuoyis-web/nginx/server/1.27.3/sbin/nginx /usr/bin/nginx && \
+    mv /nuoyis-web/php/8.4.2/etc/php-fpm.conf.default /nuoyis-web/php/8.4.2/etc/php-fpm.conf && \
+    mv /nuoyis-web/php/8.1.31/etc/php-fpm.conf.default /nuoyis-web/php/8.1.31/etc/php-fpm.conf && \
+    curl -L -o /nuoyis-web/nginx/server/1.27.3/conf/nginx.conf https://alist.nuoyis.net/d/blog/nuoyis-lnmp-np/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/v1.30/nginx.conf.txt && \
+    curl -L -o /nuoyis-web/nginx/webside/default/index.html https://alist.nuoyis.net/d/blog/nuoyis-lnmp-np/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/v1.30/index.html && \
+    curl -L -o /nuoyis-web/nginx/server/1.27.3/conf/ssl/default.pem https://alist.nuoyis.net/d/blog/nuoyis-lnmp-np/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/v1.30/ssl/default.pem && \
+    curl -L -o /nuoyis-web/nginx/server/1.27.3/conf/ssl/default.key https://alist.nuoyis.net/d/blog/nuoyis-lnmp-np/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/v1.30/ssl/default.key && \
+    curl -L -o /nuoyis-web/nginx/server/1.27.3/conf/start-php-84.conf https://alist.nuoyis.net/d/blog/nuoyis-lnmp-np/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/v1.30/start-php-84.conf.txt && \
+    curl -L -o /nuoyis-web/nginx/server/1.27.3/conf/path.conf https://alist.nuoyis.net/d/blog/nuoyis-lnmp-np/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/v1.30/path.conf.txt && \
+    curl -L -o /nuoyis-web/nginx/server/1.27.3/conf/start-php-81.conf https://alist.nuoyis.net/d/blog/nuoyis-lnmp-np/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/v1.30/start-php-81.conf.txt && \
+    curl -L -o /nuoyis-web/php/8.4.2/etc/php.ini https://alist.nuoyis.net/d/blog/nuoyis-lnmp-np/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/v1.30/84php.ini.txt && \
+    curl -L -o /nuoyis-web/php/8.4.2/etc/php-fpm.d/fpm.conf https://alist.nuoyis.net/d/blog/nuoyis-lnmp-np/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/v1.30/fpm-84.conf.txt && \
+    curl -L -o /nuoyis-web/php/8.1.31/etc/php.ini https://alist.nuoyis.net/d/blog/nuoyis-lnmp-np/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/v1.30/81php.ini.txt && \
+    curl -L -o /nuoyis-web/php/8.1.31/etc/php-fpm.d/fpm.conf https://alist.nuoyis.net/d/blog/nuoyis-lnmp-np/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/v1.30/fpm-81.conf.txt && \
+    curl -L -o /etc/supervisord.conf https://alist.nuoyis.net/d/blog/nuoyis-lnmp-np/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/v1.30/supervisord.conf.txt
+    
+# 暴露端口
+EXPOSE 80 443
+
+# 设置容器的入口点
+ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]

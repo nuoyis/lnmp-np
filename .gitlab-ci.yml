@@ -1,0 +1,61 @@
+stages:
+  - build
+  - deploy
+
+nuoyis_image_tag:
+  image: ubuntu:20.04
+  stage: build
+  except:
+    - build.json
+    - README.md
+  script:
+    - echo "Changing to domestic mirrors for faster package installation"
+    - cp /etc/apt/sources.list /etc/apt/sources.list.bak  # 备份原始源列表
+    - sed -i 's/http:\/\/archive.ubuntu.com/https:\/\/mirrors.aliyun.com/g' /etc/apt/sources.list  # 更换为阿里云镜像源
+    - sed -i 's/http:\/\/security.ubuntu.com/https:\/\/mirrors.aliyun.com/g' /etc/apt/sources.list  # 更换为阿里云镜像源
+    - apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false update -y && apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false upgrade -y && apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false install -y ca-certificates  # 更新源列表
+    - apt-get install -y git curl build-essential jq  # 安装常用工具，如 git, curl 等
+    - current_version=$(jq -r '.version' build.json)
+    - IFS='.' read -ra version_parts <<< "$current_version"
+    - ((version_parts[2]++))
+    - new_version="${version_parts[0]}.${version_parts[1]}.${version_parts[2]}"
+    - jq ".version = \"$new_version\"" build.json > temp.json
+    - mv temp.json build.json
+    - git config user.name "nuoyis"
+    - git config user.email "wkkjonlykang@vip.qq.com"
+    - git remote rm origin
+    - git remote add origin http://oauth2:$GitLab_Access_Tokens@192.168.223.1:2236/nuoyis/nuoyis-lnmp-np.git
+    - git add build.json
+    - git commit -m "use to $new_version"
+    - git push origin HEAD:main -o ci.skip
+    - echo "VERSION=$new_version" > nuoyis.env
+  artifacts:
+    paths:
+      - nuoyis.env
+  only: 
+    - main
+
+nuoyis_image_build:
+  image: docker:20.10.8
+  timeout: 10 hours
+  stage: deploy
+  dependencies:
+    - nuoyis_image_tag
+  services:
+    - name: docker:20.10.8-dind
+      alias: docker
+      command: ["--insecure-registry=0.0.0.0/0"]
+  variables:
+    DOCKER_DRIVER: overlay2  # 使用 overlay2 存储驱动
+  script:
+    - export $(cat nuoyis.env | xargs)
+    - echo $VERSION
+    - echo "Building Docker image..."
+    - docker build --no-cache -t "nuoyis-lnmp-np:$VERSION" -f ./dockerfile/dockerfile .
+    - docker tag "nuoyis-lnmp-np:$VERSION" "registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp:$VERSION"
+    - docker tag "nuoyis-lnmp-np:$VERSION" "registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp:latest"
+    - 'docker login --username=$DOCKER_USERNAME --password=$DOCKER_PASSWORD registry.cn-hangzhou.aliyuncs.com'
+    - docker push registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp:latest
+    - docker push registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp:$VERSION
+  only:
+    - main

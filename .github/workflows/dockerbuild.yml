@@ -84,6 +84,7 @@ jobs:
 
       - name: Tag Docker Image
         run: |
+          echo "docker tag for aliyun"
           docker tag "nuoyis-lnmp-np:$VERSION" "registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp:$VERSION"
           docker tag "nuoyis-lnmp-np:$VERSION" "registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp:latest"
 

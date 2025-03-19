@@ -6,6 +6,7 @@ on:
       - main
     paths-ignore:
       - 'build.json'
+      - '.gitlab-ci.yml'
 
 jobs:
   version_update:
@@ -49,8 +50,12 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
+
           git add build.json
           git commit -m "Bump version to ${{ env.new_version }}" || exit 0
+
+          # 使用 GitHub Actions 提供的 GITHUB_TOKEN 进行身份验证
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           git push origin main
 
   build_and_push:

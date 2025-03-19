@@ -7,6 +7,7 @@ on:
     paths-ignore:
       - 'build.json'
       - '.gitlab-ci.yml'
+      - 'readme.md'
       
 permissions:
   contents: write
@@ -23,7 +24,7 @@ jobs:
           persist-credentials: false
         
       - name: Install jq
-        run: sudo apt-get install -y jq && ls -a && sleep 10
+        run: sudo apt-get install -y jq
 
       - name: Read Current Version
         id: read_version

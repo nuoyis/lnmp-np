@@ -7,6 +7,9 @@ on:
     paths-ignore:
       - 'build.json'
       - '.gitlab-ci.yml'
+      
+permissions:
+  contents: write
 
 jobs:
   version_update:

@@ -80,15 +80,15 @@ jobs:
       - name: Build Docker Image
         run: |
           echo "Building Docker image for version: $VERSION"
-          docker build --no-cache -t "nuoyis-lnmp-np:$VERSION" -f ./dockerfile/dockerfile .
+          bash build.sh 1 $VERSION
 
       - name: Tag Docker Image
         run: |
           echo "docker tag for aliyun"
-          docker tag "nuoyis-lnmp-np:$VERSION" "registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp:$VERSION"
-          docker tag "nuoyis-lnmp-np:$VERSION" "registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp:latest"
+          docker tag "nuoyis-lnmp-np:$VERSION" "registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp-np:$VERSION"
+          docker tag "nuoyis-lnmp-np:$VERSION" "registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp-np:latest"
 
       - name: Push Docker Image
         run: |
-          docker push registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp:$VERSION
-          docker push registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp:latest
+          docker push registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp-np:$VERSION
+          docker push registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp-np:latest

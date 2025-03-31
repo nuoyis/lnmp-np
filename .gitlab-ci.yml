@@ -51,7 +51,7 @@ nuoyis_image_build:
     - export $(cat nuoyis.env | xargs)
     - echo $VERSION
     - echo "Building Docker image..."
-    - docker build --no-cache -t "nuoyis-lnmp-np:$VERSION" -f ./dockerfile/dockerfile .
+    - docker build --no-cache -t "nuoyis-lnmp-np:$VERSION" -f ./dockerfile/dockerfile_other .
     - docker tag "nuoyis-lnmp-np:$VERSION" "registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp:$VERSION"
     - docker tag "nuoyis-lnmp-np:$VERSION" "registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp:latest"
     - 'docker login --username=$DOCKER_USERNAME --password=$DOCKER_PASSWORD registry.cn-hangzhou.aliyuncs.com'

@@ -5,9 +5,8 @@
 echo "Welcome use nuoyis's lnmp service"
 
 # 启动检查
+# 默认HTML
 DEFAULTFILE=/nuoyis-web/nginx/webside/default/index.html
-
-
 
 if [ ! -f "$DEFAULTFILE" ]; then
 echo "default page is not found. then create new default page of html"
@@ -19,6 +18,9 @@ EOF
 else
 echo "default page is found. then use default page of html"
 fi
+# 启动则创建文件夹并touch一个缺失的文件
+mkdir -p /nuoyis-web/logs/nginx/
+touch /nuoyis-web/logs/nginx/error.log
 
 echo "nuoyis service is starting"
 exec "$@"

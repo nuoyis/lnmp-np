@@ -93,7 +93,6 @@ jobs:
           IMAGE_MULTI="registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp-np:$VERSION"
           IMAGE_LIST="\
           ${IMAGE_MULTI}-linux-amd64 \
-          ${IMAGE_MULTI}-linux-386 \
           ${IMAGE_MULTI}-linux-arm64 \
           ${IMAGE_MULTI}-linux-arm-v7"
           echo "Creating manifest for: $IMAGE_LIST"

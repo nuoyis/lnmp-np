@@ -46,7 +46,7 @@ nuoyis_image_build:
     - chmod +x build.sh
   script:
     - export $(cat nuoyis.env | xargs)
-    - echo "构建版本号: $VERSION"
+    - echo "构建版本号 $VERSION"
     - REGISTRY_URL="registry.cn-hangzhou.aliyuncs.com"
     - IMAGE_NAME="nuoyis/nuoyis-lnmp"
     - IMAGE_MULTI="$REGISTRY_URL/$IMAGE_NAME:$VERSION"

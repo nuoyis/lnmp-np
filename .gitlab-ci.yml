@@ -36,7 +36,7 @@ nuoyis_image_build:
   - sed -i 's|http://security.ubuntu.com|https://mirrors.aliyun.com|g' /etc/apt/sources.list
   - apt-get update && apt-get install -y curl jq git docker.io qemu-user-static binfmt-support ca-certificates
   - DOWNLOAD_URL="https://mirrors.tuna.tsinghua.edu.cn/docker-ce"
-  - curl -fsSL https://raw.githubusercontent.com/docker/docker-install/master/install.sh | sh
+  - curl -fsSL https://gh-proxy.ygxz.in/https://raw.githubusercontent.com/docker/docker-install/master/install.sh | sh
   - docker --version
   - docker buildx version
   - chmod +x build.sh

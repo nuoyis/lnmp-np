@@ -47,21 +47,6 @@ jobs:
           echo "new_version=$new_version" >> $GITHUB_ENV
           echo "new_version=$new_version" >> $GITHUB_OUTPUT
 
-          jq ".version = \"$new_version\"" build.json > temp.json
-          mv temp.json build.json
-
-      - name: Commit and Push Version Update
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-
-          git add build.json
-          git commit -m "Bump version to ${{ env.new_version }}" || exit 0
-
-          # 使用 GitHub Actions 提供的 GITHUB_TOKEN 进行身份验证
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-          git push origin main
-
   build_and_push:
     name: Build and Push Docker Image
     needs: version_update
@@ -99,3 +84,20 @@ jobs:
           docker buildx imagetools create -t "$IMAGE_MULTI" $IMAGE_LIST
           docker tag "$IMAGE_MULTI" "registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp-np:latest"
           docker push "registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp-np:latest"
+      
+      - name: Version update
+        run: |
+          jq ".version = \"$VERSION\"" build.json > temp.json
+          mv temp.json build.json
+
+      - name: Commit and Push Version Update
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+          git add build.json
+          git commit -m "Bump version to ${{ env.new_version }}" || exit 0
+
+          # 使用 GitHub Actions 提供的 GITHUB_TOKEN 进行身份验证
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git push origin main

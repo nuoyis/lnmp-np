@@ -39,6 +39,9 @@ nuoyis_image_build:
   - curl -fsSL https://gh-proxy.ygxz.in/https://raw.githubusercontent.com/docker/docker-install/master/install.sh | sh
   - docker --version
   - docker buildx version
+  - docker buildx create --name multi-builder --driver docker-container --use
+  - docker run --rm --privileged tonistiigi/binfmt --install all
+  - docker buildx inspect --bootstrap
   - chmod +x build.sh
   script:
     - export $(cat nuoyis.env | xargs)

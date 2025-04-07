@@ -13,11 +13,11 @@ os_id=$(grep '^ID=' /etc/os-release | cut -d= -f2 | tr -d '"')
 # 根据操作系统类型安装 jq
 case "$os_id" in
     debian|ubuntu)
-        sudo apt-get update
-        sudo apt-get install -y jq
+        apt-get update
+        apt-get install -y jq
         ;;
     centos|rhel|fedora)
-        sudo yum install -y jq
+        yum install -y jq
         ;;
     *)
         echo "Unsupported operating system: $os_id"

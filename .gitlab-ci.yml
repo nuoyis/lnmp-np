@@ -50,12 +50,19 @@ nuoyis_image_build:
   script:
     - export $(cat nuoyis.env | xargs)
     - echo $VERSION
-    - echo "Building Docker image..."
-    - docker build --no-cache -t "nuoyis-lnmp-np:$VERSION" -f ./dockerfile/dockerfile_other .
-    - docker tag "nuoyis-lnmp-np:$VERSION" "registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp:$VERSION"
-    - docker tag "nuoyis-lnmp-np:$VERSION" "registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp:latest"
-    - 'docker login --username=$DOCKER_USERNAME --password=$DOCKER_PASSWORD registry.cn-hangzhou.aliyuncs.com'
-    - docker push registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp:latest
-    - docker push registry.cn-hangzhou.aliyuncs.com/nuoyis/nuoyis-lnmp:$VERSION
+    - REGISTRY_URL="registry.cn-hangzhou.aliyuncs.com"
+    - IMAGE_NAME="nuoyis/nuoyis-lnmp"
+    - IMAGE_MULTI="$REGISTRY_URL/$IMAGE_NAME:$VERSION"
+    - IMAGE_LIST="\
+      ${IMAGE_MULTI}-linux-amd64 \
+      ${IMAGE_MULTI}-linux-arm64 \
+      ${IMAGE_MULTI}-linux-arm-v7"
+
+    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $REGISTRY_URL
+
+    - echo "创建 manifest 并打标签"
+    - docker buildx imagetools create -t "$IMAGE_MULTI" $IMAGE_LIST
+    - docker tag "$IMAGE_MULTI" "$REGISTRY_URL/$IMAGE_NAME:latest"
+    - docker push "$REGISTRY_URL/$IMAGE_NAME:latest"
   only:
     - main

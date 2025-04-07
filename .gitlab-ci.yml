@@ -48,6 +48,8 @@ nuoyis_image_build:
   variables:
     DOCKER_DRIVER: overlay2  # 使用 overlay2 存储驱动
   script:
+    - sed -i 's#https\?://dl-cdn.alpinelinux.org/alpine#https://mirrors.tuna.tsinghua.edu.cn/alpine#g' /etc/apk/repositories
+    - apk update && apk add --no-cache bash
     - export $(cat nuoyis.env | xargs)
     - echo $VERSION
     - REGISTRY_URL="registry.cn-hangzhou.aliyuncs.com"

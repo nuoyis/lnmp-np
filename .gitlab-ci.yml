@@ -49,14 +49,7 @@ nuoyis_image_build:
   script:
     - export $(cat nuoyis.env | xargs)
     - echo "构建版本号 $VERSION"
-    - REGISTRY_URL="registry.cn-hangzhou.aliyuncs.com"
-    - IMAGE_NAME="nuoyis/nuoyis-lnmp"
-    - IMAGE_MULTI="$REGISTRY_URL/$IMAGE_NAME:$VERSION"
-    - IMAGE_LIST="\
-      ${IMAGE_MULTI}-linux-amd64 \
-      ${IMAGE_MULTI}-linux-arm64 \
-      ${IMAGE_MULTI}-linux-arm-v7"
-    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $REGISTRY_URL
+    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD registry.cn-hangzhou.aliyuncs.com
     - bash build.sh 2 $VERSION
     - jq ".version = \"$VERSION\"" build.json > temp.json
     - mv temp.json build.json

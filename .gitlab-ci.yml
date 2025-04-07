@@ -43,7 +43,7 @@ nuoyis_image_build:
   - mkdir -p /etc/buildkit/
   - cat > /etc/buildkit/buildkitd.toml<< EOF
         [registry."docker.io"]
-        mirrors = [
+          mirrors = [
           "https://hub.nastool.de",
           "https://docker.1ms.run",
           "https://docker.1panel.live",

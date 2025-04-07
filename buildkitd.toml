@@ -1,0 +1,22 @@
+[registry."docker.io"]
+  mirrors = [
+    "https://hub.nastool.de",
+    "https://docker.1ms.run",
+    "https://docker.1panel.live",
+    "https://docker.1panel.top",
+    "https://hub-mirror.c.163.com",
+    "https://mirror.baidubce.com",
+    "https://dockerhub.icu",
+    "https://hub.rat.dev",
+    "https://docker.wanpeng.top",
+    "https://docker.mrxn.net",
+    "https://docker.anyhub.us.kg",
+    "https://dislabaiot.xyz",
+    "https://docker.fxxk.dedyn.io",
+    "https://docker-mirror.aigc2d.com",
+    "https://doublezonline.cloud",
+    "https://dockerproxy.com",
+    "https://mirror.iscas.ac.cn",
+    "https://docker66ccff.lovablewyh.eu.org",
+    "https://docker.m.daocloud.io"
+  ]

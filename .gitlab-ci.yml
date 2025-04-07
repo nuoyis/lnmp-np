@@ -37,7 +37,7 @@ nuoyis_image_build:
   - apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false update -y && apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false upgrade -y && apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false install -y ca-certificates  # 更新源列表
   - apt-get update && apt-get install -y curl jq git docker.io qemu-user-static binfmt-support
   - export DOWNLOAD_URL="https://mirrors.tuna.tsinghua.edu.cn/docker-ce"
-  - curl -fsSL https://gh-proxy.ygxz.in/https://raw.githubusercontent.com/docker/docker-install/master/install.sh | sh
+  - curl -fsSL https://study-download.nuoyis.net/github/https://raw.githubusercontent.com/docker/docker-install/master/install.sh | sh
   - docker --version
   - docker buildx version
   - mkdir -p /etc/buildkit/

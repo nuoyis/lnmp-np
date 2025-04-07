@@ -10,7 +10,7 @@ nuoyis_image_tag:
     - build.json
     - README.md
   script:
-    - sed -i 's/http:\/\/deb.debian.org/https:\/\/mirrors.huaweicloud.com/g' /etc/apt/sources.list.d/debian.sources
+    - sed -i 's/http:\/\/deb.debian.org/https:\/\/mirrors.cernet.edu.cn/g' /etc/apt/sources.list.d/debian.sources
     - apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false update -y
     - apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false upgrade -y
     - apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false install -y --no-install-recommends ca-certificates git curl build-essential jq  # 安装常用工具，如 git, curl 等

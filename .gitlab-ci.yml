@@ -4,6 +4,7 @@ stages:
 
 nuoyis_image_tag:
   image: ubuntu:24.04
+  interruptible: true
   stage: build
   except:
     - build.json
@@ -27,6 +28,7 @@ nuoyis_image_tag:
 
 nuoyis_image_build:
   image: ubuntu:24.04
+  interruptible: true
   timeout: 10 hours
   stage: deploy
   dependencies:

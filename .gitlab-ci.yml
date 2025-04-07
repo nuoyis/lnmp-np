@@ -3,15 +3,15 @@ stages:
   - deploy
 
 nuoyis_image_tag:
-  image: ubuntu:latest
+  image: ubuntu:24.04
   stage: build
   except:
     - build.json
     - README.md
   script:
     - echo "Changing to domestic mirrors for faster package installation"
-    - sed -i 's|http://archive.ubuntu.com|https://mirrors.aliyun.com|g' /etc/apt/sources.list
-    - sed -i 's|http://security.ubuntu.com|https://mirrors.aliyun.com|g' /etc/apt/sources.list
+    - sed -i 's|http://archive.ubuntu.com|https://mirrors.aliyun.com|g' /etc/apt/sources.list.d/ubuntu.sources
+    - sed -i 's|http://security.ubuntu.com|https://mirrors.aliyun.com|g' /etc/apt/sources.list.d/ubuntu.sources
     - apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false update -y && apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false upgrade -y && apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false install -y ca-certificates  # 更新源列表
     - apt-get install -y git curl build-essential jq  # 安装常用工具，如 git, curl 等
     - current_version=$(jq -r '.version' build.json)
@@ -26,21 +26,22 @@ nuoyis_image_tag:
     - main
 
 nuoyis_image_build:
-  image: ubuntu:latest
+  image: ubuntu:24.04
   timeout: 10 hours
   stage: deploy
   dependencies:
     - nuoyis_image_tag
   before_script:
-  - sed -i 's|http://archive.ubuntu.com|https://mirrors.aliyun.com|g' /etc/apt/sources.list
-  - sed -i 's|http://security.ubuntu.com|https://mirrors.aliyun.com|g' /etc/apt/sources.list
+  - sed -i 's|http://archive.ubuntu.com|https://mirrors.aliyun.com|g' /etc/apt/sources.list.d/ubuntu.sources
+  - sed -i 's|http://security.ubuntu.com|https://mirrors.aliyun.com|g' /etc/apt/sources.list.d/ubuntu.sources
   - apt-get update && apt-get install -y curl jq git docker.io qemu-user-static binfmt-support ca-certificates
   - export DOWNLOAD_URL="https://mirrors.tuna.tsinghua.edu.cn/docker-ce"
   - curl -fsSL https://gh-proxy.ygxz.in/https://raw.githubusercontent.com/docker/docker-install/master/install.sh | sh
   - docker --version
   - docker buildx version
-  - docker buildx create --name multi-builder --driver docker-container --use
-  - docker run --rm --privileged tonistiigi/binfmt --install all
+  - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+  - docker buildx create --name mybuilder
+  - docker buildx use mybuilder
   - docker buildx inspect --bootstrap
   - chmod +x build.sh
   script:

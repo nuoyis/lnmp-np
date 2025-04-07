@@ -57,6 +57,7 @@ nuoyis_image_build:
       ${IMAGE_MULTI}-linux-amd64 \
       ${IMAGE_MULTI}-linux-arm64 \
       ${IMAGE_MULTI}-linux-arm-v7"
+    - bash build.sh 2 $VERSION
     - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $REGISTRY_URL
     - echo "创建 manifest 并打标签"
     - docker buildx imagetools create -t "$IMAGE_MULTI" $IMAGE_LIST

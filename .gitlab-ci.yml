@@ -32,17 +32,21 @@ nuoyis_image_build:
   dependencies:
     - nuoyis_image_tag
   services:
-    - name: docker:20.10.8-dind
+    - name: docker:24.0.5-dind
       alias: docker
       command: ["--insecure-registry=0.0.0.0/0"]
   before_script:
-    - sed -i 's/http:\/\/archive.ubuntu.com/https:\/\/mirrors.aliyun.com/g' /etc/apt/sources.list  # 更换为阿里云镜像源
-    - sed -i 's/http:\/\/security.ubuntu.com/https:\/\/mirrors.aliyun.com/g' /etc/apt/sources.list  # 更换为阿里云镜像源
-    - apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false update -y && apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false upgrade -y && apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false install -y ca-certificates  # 更新源列表
-    - apt-get update && apt-get install -y bash docker.io curl
+    - sed -i 's|http://archive.ubuntu.com|https://mirrors.aliyun.com|g' /etc/apt/sources.list
+    - sed -i 's|http://security.ubuntu.com|https://mirrors.aliyun.com|g' /etc/apt/sources.list
+    - apt-get update && apt-get install -y curl jq git docker.io qemu-user-static binfmt-support ca-certificates
+    - docker --version
+    - docker run --privileged --rm tonistiigi/binfmt --install all
+    - docker buildx version || docker buildx install
+    - docker buildx create --name multi-builder --use --bootstrap || docker buildx use multi-builder
+    - chmod +x build.sh
   script:
     - export $(cat nuoyis.env | xargs)
-    - echo $VERSION
+    - echo "构建版本号: $VERSION"
     - REGISTRY_URL="registry.cn-hangzhou.aliyuncs.com"
     - IMAGE_NAME="nuoyis/nuoyis-lnmp"
     - IMAGE_MULTI="$REGISTRY_URL/$IMAGE_NAME:$VERSION"

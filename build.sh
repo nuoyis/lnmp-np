@@ -57,5 +57,5 @@ if [ $is_it == "2" ];then
     sed -i 's|https://github.com|https://study-download.nuoyis.net/github/https://github.com|g' dockerfile/dockerfile
 fi
 
-docker buildx build --platform "linux/amd64,linux/arm64,linux/arm/v7" --build-arg NGINX_VERSION=$NGINX_VERSION --build-arg PHP_LATEST_VERSION=$PHP_LATEST_VERSION --build-arg PHP_STABLE_VERSION=$PHP_STABLE_VERSION --build-arg PHP_REDIS_VERSION=$PHP_REDIS_VERSION --no-cache -t nuoyis-lnmp-np:$build_version -f dockerfile/dockerfile . &> /dev/null
+docker buildx build --platform "linux/amd64,linux/arm64,linux/arm/v7" --build-arg NGINX_VERSION=$NGINX_VERSION --build-arg PHP_LATEST_VERSION=$PHP_LATEST_VERSION --build-arg PHP_STABLE_VERSION=$PHP_STABLE_VERSION --build-arg PHP_REDIS_VERSION=$PHP_REDIS_VERSION --no-cache -t nuoyis-lnmp-np:$build_version -f dockerfile/dockerfile . --load
 # docker build -t nuoyis-lnmp-np:l --build-arg NGINX_VERSION=1.27.3 --build-arg PHP_LATEST_VERSION=8.4.2 --build-arg PHP_STABLE_VERSION=8.1.31 --build-arg PHP_REDIS_VERSION=6.1.0 --no-cache -f dockerfile/dockerfile .

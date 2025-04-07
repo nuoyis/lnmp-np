@@ -3,14 +3,13 @@ stages:
   - deploy
 
 nuoyis_image_tag:
-  image: ubuntu:20.04
+  image: ubuntu:latest
   stage: build
   except:
     - build.json
     - README.md
   script:
     - echo "Changing to domestic mirrors for faster package installation"
-    - cp /etc/apt/sources.list /etc/apt/sources.list.bak  # 备份原始源列表
     - sed -i 's/http:\/\/archive.ubuntu.com/https:\/\/mirrors.aliyun.com/g' /etc/apt/sources.list  # 更换为阿里云镜像源
     - sed -i 's/http:\/\/security.ubuntu.com/https:\/\/mirrors.aliyun.com/g' /etc/apt/sources.list  # 更换为阿里云镜像源
     - apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false update -y && apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false upgrade -y && apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false install -y ca-certificates  # 更新源列表
@@ -27,7 +26,7 @@ nuoyis_image_tag:
     - main
 
 nuoyis_image_build:
-  image: docker:20.10.8
+  image: ubuntu:latest
   timeout: 10 hours
   stage: deploy
   dependencies:
@@ -36,11 +35,12 @@ nuoyis_image_build:
     - name: docker:20.10.8-dind
       alias: docker
       command: ["--insecure-registry=0.0.0.0/0"]
-  variables:
-    DOCKER_DRIVER: overlay2  # 使用 overlay2 存储驱动
+  before_script:
+    - sed -i 's/http:\/\/archive.ubuntu.com/https:\/\/mirrors.aliyun.com/g' /etc/apt/sources.list  # 更换为阿里云镜像源
+    - sed -i 's/http:\/\/security.ubuntu.com/https:\/\/mirrors.aliyun.com/g' /etc/apt/sources.list  # 更换为阿里云镜像源
+    - apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false update -y && apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false upgrade -y && apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false install -y ca-certificates  # 更新源列表
+    - apt-get update && apt-get install -y bash docker.io curl
   script:
-    - sed -i 's#https\?://dl-cdn.alpinelinux.org/alpine#https://mirrors.tuna.tsinghua.edu.cn/alpine#g' /etc/apk/repositories
-    - apk update && apk add --no-cache bash
     - export $(cat nuoyis.env | xargs)
     - echo $VERSION
     - REGISTRY_URL="registry.cn-hangzhou.aliyuncs.com"

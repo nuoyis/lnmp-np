@@ -13,7 +13,8 @@ nuoyis_image_tag:
     - sed -i 's/http:\/\/deb.debian.org/https:\/\/mirrors.cernet.edu.cn/g' /etc/apt/sources.list.d/debian.sources
     - apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false update -y
     - apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false upgrade -y
-    - apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false install -y --no-install-recommends ca-certificates git curl build-essential jq  # 安装常用工具，如 git, curl 等
+    - apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false install -y --no-install-recommends ca-certificates # 安装常用工具，如 git, curl 等
+    - apt-get install -y git curl build-essential jq
     - current_version=$(jq -r '.version' build.json)
     - IFS='.' read -ra version_parts <<< "$current_version"
     - ((version_parts[2]++))
@@ -36,7 +37,8 @@ nuoyis_image_build:
   - sed -i 's/http:\/\/deb.debian.org/https:\/\/mirrors.cernet.edu.cn/g' /etc/apt/sources.list.d/debian.sources
   - apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false update -y
   - apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false upgrade -y
-  - apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false install -y --no-install-recommends ca-certificates curl jq git docker.io qemu-user-static binfmt-support
+  - apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false install -y --no-install-recommends ca-certificates
+  - apt-get install -y curl jq git docker.io qemu-user-static binfmt-support
   - export DOWNLOAD_URL="https://mirrors.tuna.tsinghua.edu.cn/docker-ce"
   - curl -fsSL https://study-download.nuoyis.net/github/https://raw.githubusercontent.com/docker/docker-install/master/install.sh | sh
   - docker --version

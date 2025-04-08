@@ -4,10 +4,6 @@ FROM debian:12 as builder
 # 设置默认 shell
 SHELL ["/bin/bash", "-c"]
 
-# 设置时区
-ENV TZ=Asia/Shanghai
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
 # 定义版本变量
 ARG NGINX_VERSION
 ARG PHP_LATEST_VERSION

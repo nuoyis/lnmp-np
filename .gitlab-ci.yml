@@ -45,7 +45,7 @@ nuoyis_image_build:
   - docker buildx version
   - mkdir -p /etc/buildkit/
   - cp ./buildkitd.toml /etc/buildkit/
-  - docker run --rm --privileged docker.m.daocloud.io/tonistiigi/binfmt --install all
+  - docker run --rm --privileged docker.m.daocloud.io/tonistiigi/binfmt -v /etc/localtime:/etc/localtime --install all
   - docker buildx create --name mybuilder --driver docker-container --config /etc/buildkit/buildkitd.toml --use
   - docker buildx inspect --bootstrap
   - chmod +x build.sh

@@ -11,7 +11,7 @@ ARG PHP_STABLE_VERSION
 ARG PHP_REDIS_VERSION
 
 # 更换华为软件源，并安装基础依赖
-RUN sed -i 's/http:\/\/deb.debian.org/https:\/\/mirrors.cernet.edu.cn/g' /etc/apt/sources.list.d/debian.sources && \
+RUN sed -i 's/http:\/\/deb.debian.org/https:\/\/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list.d/debian.sources && \
     apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false update -y && \
     apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false upgrade -y && \
     apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false install -y --no-install-recommends \
@@ -241,7 +241,7 @@ COPY --from=builder /runner-libs/lib /lib
 RUN useradd -u 2233 -m -s /sbin/nologin nuoyis-web && \
     mkdir -p /var/run/php/{stable,latest} && \
     mkdir -p /lib /lib64 /usr/lib /usr/lib64 /usr/lib/x86_64-linux-gnu && \
-    sed -i 's/http:\/\/deb.debian.org/https:\/\/mirrors.cernet.edu.cn/g' /etc/apt/sources.list.d/debian.sources && \
+    sed -i 's/http:\/\/deb.debian.org/https:\/\/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list.d/debian.sources && \
     apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false update -y && \
     apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false upgrade -y && \
     apt-get -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false install -y --no-install-recommends supervisor curl ca-certificates && \

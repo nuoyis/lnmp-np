@@ -1,15 +1,15 @@
 [global]
-pid = /var/run/php/stable/php-fpm.pid
-error_log = /var/run/php/stable/php-fpm.log
-log_level = notice
+pid = /run/php/stable/php-fpm.pid
+error_log = /web/logs/php/stable/php-fpm.log
+log_level = warning
 
 [www]
-user = nuoyis-web
-group = nuoyis-web
+;user = web
+;group = web
 
-listen = /var/run/php-cgi-stable.sock
-listen.owner = nuoyis-web
-listen.group = nuoyis-web
+listen = /run/php-cgi-stable.sock
+listen.owner = web
+listen.group = web
 
 pm = dynamic
 pm.max_children = 10
@@ -17,5 +17,5 @@ pm.start_servers = 3
 pm.min_spare_servers = 2
 pm.max_spare_servers = 5
 
-php_admin_value[error_log] = /var/log/php-fpm/www-error.log
+php_admin_value[error_log] = /web/logs/php/stable/www-error.log
 php_admin_flag[log_errors] = on

@@ -1,0 +1,16 @@
+# 默认页面的 自定义设置(禁止编写server，否则报错)
+
+# 301 配置
+# return 301 https://你的网站名$request_uri;
+
+# SSL 配置
+ssl_certificate /web/nginx/server/conf/ssl/default.pem;
+ssl_certificate_key /web/nginx/server/conf/ssl/default.key;
+        
+# 默认页面设置
+root /web/nginx/webside/default;
+index index.html;
+
+# 错误页面配置
+error_page 404 /404.html;
+error_page 500 502 503 504 /50x.html;

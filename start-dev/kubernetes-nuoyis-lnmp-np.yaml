@@ -23,10 +23,7 @@ spec:
         runAsGroup: 0
       containers:
         - name: nuoyis-lnmp-np
-          image: nuoyis1024/nuoyis-lnmp-np:dev
-          env:
-            - name: MYSQL_ROOT_PASSWORD
-              value: ""
+          image: nuoyis1024/lnmp-np:dev
           ports:
             - name: http
               containerPort: 80
@@ -43,12 +40,6 @@ spec:
               mountPath: /web/nginx/ssl
             - name: logs
               mountPath: /web/logs
-            - name: mariadb-init
-              mountPath: /docker-entrypoint-initdb.d
-            - name: mariadb-data
-              mountPath: /web/mariadb/data
-            - name: mariadb-config
-              mountPath: /web/config
             - name: shm
               mountPath: /dev/shm
           startupProbe:
@@ -90,15 +81,6 @@ spec:
         - name: logs
           hostPath:
             path: /var/log/web
-        - name: mariadb-init
-          hostPath:
-            path: /nuoyis-server/web/mariadb/init
-        - name: mariadb-data
-          hostPath:
-            path: /nuoyis-server/web/mariadb/server
-        - name: mariadb-config
-          hostPath:
-            path: /nuoyis-server/web/mariadb/config
         - name: shm
           emptyDir:
             medium: Memory
@@ -129,8 +111,3 @@ spec:
       targetPort: 443
       nodePort: 443
       protocol: UDP
-    - name: mariadb
-      port: 3306
-      targetPort: 3306
-      nodePort: 3306
-      protocol: TCP

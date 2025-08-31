@@ -24,9 +24,6 @@ spec:
       containers:
         - name: nuoyis-lnmp-np
           image: registry.cn-hangzhou.aliyuncs.com/nuoyis/lnmp-np:latest
-          env:
-            - name: MYSQL_ROOT_PASSWORD
-              value: ""
           ports:
             - name: http
               containerPort: 80

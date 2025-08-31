@@ -5,7 +5,7 @@
 echo "Welcome use nuoyis's lnmp service"
 
 mkdir -p /web/nginx/webside/default/
-mkdir -p /web/logs/nginx,php/{latest,stable}
+mkdir -p /web/logs/{nginx,php/{latest,stable}}
 # nginx/php 文件/服务检查
 # 默认HTML
 echo "check nginx service"

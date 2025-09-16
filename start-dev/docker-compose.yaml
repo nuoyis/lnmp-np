@@ -10,7 +10,7 @@ services:
     ports:
       - 80:80
       - 443:443
-      - 3306:3306
+      - 443:443/udp
     volumes:
       # nginx 配置文件
       - /nuoyis-server/web/nginx/conf:/web/nginx/conf
